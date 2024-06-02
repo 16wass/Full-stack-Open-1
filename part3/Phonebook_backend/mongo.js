@@ -18,6 +18,13 @@ const personSchema = new mongoose.Schema({
   content: String,
   important: Boolean,
 });
+personSchema.set('toJSON', {
+    transform: (document, returnedObject) => {
+      returnedObject.id = returnedObject._id.toString()
+      delete returnedObject._id
+      delete returnedObject.__v
+    }
+  })
 
 // Create Note model
 const Person = mongoose.model('Person', personSchema);

@@ -1,7 +1,9 @@
+require('dotenv').config()
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const path = require('path');
+Person = require('./models/phonebook');
 
 const app = express();
 
@@ -22,7 +24,7 @@ app.use(express.json());
 // Serve files from the 'dist' 
 app.use(express.static(path.join(__dirname, 'dist')));
 
-const phonebookEntries = [
+/**const phonebookEntries = [
         { 
             "id": 1,
             "name": "Arto Hellas", 
@@ -43,15 +45,20 @@ const phonebookEntries = [
             "name": "Mary Poppendieck", 
             "number": "39-23-6423122"
         }
-];
+];*/
 
 // Route for /api/persons
-app.get('/api/persons', (req, res) => {
+/**app.get('/api/persons', (_req, res) => {
     res.json(phonebookEntries);
-});
-app.get('/api/persons/:id', (req, res) => {
+});*/
+app.get('/api/persons', (_req, res) => {
+    Person.find({}).then(persons => {
+      response.json(persons)
+    })
+  })
+/**app.get('/api/persons/:id', (req, res) => {
     const id = Number(req.params.id);
-    const entry = phonebookEntries.find(entry => entry.id === id);
+    const entry = persons.find(entry => entry.id === id);
     if (entry) {
         res.json(entry);
     } else {
@@ -59,19 +66,37 @@ app.get('/api/persons/:id', (req, res) => {
     }
 }
 );
+*/
+app.get('/api/persons/:id', (req, res) => {
+    const id = req.params.id;
+    Person.findById(id)
+      .then(person => {
+        if (person) {
+          res.json(person);
+        } else {
+          res.status(404).end();
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching person by ID:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+      });
+  });
+  
+
 app.delete('/api/persons/:id',(req,res)=>{
     const id = Number(req.params.id);
-    phonebookEntries = phonebookEntries.filter(entry => entry.id !== id);
+    persons = persons.filter(entry => entry.id !== id);
     res.status(204).end();
 }
-)
+);
 
-app.post('/api/persons', (req, res) => {
+/**app.post('/api/persons', (req, res) => {
     const body = req.body;
     if (!body.name || !body.number) {
         return res.status(400).json({ error: 'content missing' });
     }
-    if (phonebookEntries.find(entry => entry.name === body.name)) {
+    if (persons.find(entry => entry.name === body.name)) {
         return res.status(400).json({ error: 'name must be unique' });
     }
     const entry ={
@@ -81,6 +106,21 @@ app.post('/api/persons', (req, res) => {
     }
     phonebookEntries = phonebookEntries.concat(entry);
     res.json(entry);
+}
+);*/ 
+app.post('/api/persons', (req, res) => {
+    const body = req.body;
+    if (!body.name || !body.number) {
+        return res.status(400).json({ error: 'content missing' });
+    }
+    const person = new Person({
+      content: body.content,
+      important: body.important || false,
+    })
+    person.save().then(savedPerson => {
+      res.json(savedPerson)
+    })
+   
 }
 );
 
@@ -93,7 +133,8 @@ app.get('/info', (req, res) => {
      * @param {Object} res - The response object.
      */
     const date = new Date();
-    res.send(`<p>Phonebook has info for ${phonebookEntries.length} people</p><p>${date}</p>`);
+    /**res.send(`<p>Phonebook has info for ${phonebookEntries.length} people</p><p>${date}</p>`);*/
+    res.send(`<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`);
 });
 
 app.get('*', (req, res) => {
