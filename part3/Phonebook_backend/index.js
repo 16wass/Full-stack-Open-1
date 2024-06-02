@@ -7,7 +7,7 @@ Person = require('./models/phonebook');
 
 const app = express();
 
-app.use(cors());
+
 
 /**app.use(morgan('tiny'));*/
 
@@ -22,6 +22,8 @@ const errorHandler = (error, request, response, next) => {
   
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+      return response.status(400).json({ error: error.message })
     }
   
     next(error)
@@ -29,6 +31,7 @@ const errorHandler = (error, request, response, next) => {
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
 }
+app.use(cors());
 app.use(express.static('dist'));
 app.use(express.json());
 app.use(requestLogger);
@@ -126,7 +129,7 @@ app.delete('/api/persons/:id',(req,res)=>{
     res.json(entry);
 }
 );*/ 
-app.post('/api/persons', (req, res) => {
+/**app.post('/api/persons', (req, res) => {
     const body = req.body;
     if (!body.name || !body.number) {
         return res.status(400).json({ error: 'content missing' });
@@ -140,7 +143,28 @@ app.post('/api/persons', (req, res) => {
     })
    
 }
-);
+);*/
+app.post('/api/persons', (req, res, next) => {
+    const body = req.body;
+  
+    const person = new Person({
+      name: body.name,
+      phone: body.phone
+    });
+  
+    
+    person.save()
+      .then(savedPerson => {
+        res.json(savedPerson);
+      })
+      .catch(error => {
+        if (error.name === 'ValidationError') {
+          return res.status(400).json({ error: error.message });
+        }
+        next(error);
+      });
+  });
+  
 app.put('/api/persons/:id', (req, res, next) => {
     const body = req.body;
     const person = {
@@ -179,6 +203,7 @@ app.use(errorHandler)
 /**const PORT = 3001;*/
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
+
     /**
      * Starts the server and listens on the specified port.
      * @param {number} PORT - The port number to listen on.
