@@ -36,7 +36,7 @@ const person = new Person({
 });
 
 // Save the new person to the database
-person.save()
+/*person.save()
   .then(result => {
     console.log('Person saved!');
     mongoose.connection.close();
@@ -44,4 +44,12 @@ person.save()
   .catch(error => {
     console.error('Error saving person:', error.message);
     mongoose.connection.close();
-  });
+})*/
+Person.find({}).then(result => {
+    result.forEach(person => {
+      console.log(person);
+    });
+    mongoose.connection.close();
+  })
+
+;

@@ -17,12 +17,25 @@ morgan.token('postData', (req) => {
     }
     return '';
   });
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
   
-/** Create token for logging*/
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :postData'));
+    if (error.name === 'CastError') {
+      return response.status(400).send({ error: 'malformatted id' })
+    }
+  
+    next(error)
+  } 
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(express.static('dist'));
 app.use(express.json());
-// Serve files from the 'dist' 
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(requestLogger);
+/** Create token for logging*/
+/**app.use(morgan(':method :url :status :res[content-length] - :response-time ms :postData'));
+app.use(express.json()); 
+app.use(express.static(path.join(__dirname, 'dist')));*/
 
 /**const phonebookEntries = [
         { 
@@ -77,17 +90,22 @@ app.get('/api/persons/:id', (req, res) => {
           res.status(404).end();
         }
       })
-      .catch(error => {
-        console.error('Error fetching person by ID:', error.message);
-        res.status(500).json({ error: 'Internal server error' });
-      });
+      .catch(error => next(error))
   });
   
 
-app.delete('/api/persons/:id',(req,res)=>{
+/**app.delete('/api/persons/:id',(req,res)=>{
     const id = Number(req.params.id);
     persons = persons.filter(entry => entry.id !== id);
     res.status(204).end();
+}
+);*/
+app.delete('/api/persons/:id',(req,res)=>{
+    Person.findByIdAndRemove(req.params.id)
+        .then(result => {
+            res.status(204).end()
+        })
+        .catch(error => next(error))
 }
 );
 
@@ -123,8 +141,18 @@ app.post('/api/persons', (req, res) => {
    
 }
 );
-
-
+app.put('/api/persons/:id', (req, res, next) => {
+    const body = req.body;
+    const person = {
+      content: body.content,
+      important: body.important
+    }
+    Person.findByIdAndUpdate(req.params.id, person , { new: true })
+        .then(updatedPerson => {
+            res.json(updatedPerson)
+        })
+        .catch(error => next(error))
+});
 //Route for getting the info of the phonebook
 app.get('/info', (req, res) => {
     /**
@@ -132,15 +160,23 @@ app.get('/info', (req, res) => {
      * @param {Object} req - The request object.
      * @param {Object} res - The response object.
      */
-    const date = new Date();
-    /**res.send(`<p>Phonebook has info for ${phonebookEntries.length} people</p><p>${date}</p>`);*/
-    res.send(`<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`);
+    /**const date = new Date();
+    res.send(`<p>Phonebook has info for ${phonebookEntries.length} people</p><p>${date}</p>`);*/
+    erson.countDocuments({})
+        .then(count => {
+            const date = new Date();
+            res.send(`<p>Phonebook has info for ${count} persons</p><p>${date}</p>`);
+        })
+        .catch(error => next(error));
 });
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
+app.use(unknownEndpoint)
+app.use(errorHandler)
+/**const PORT = 3001;*/
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     /**
