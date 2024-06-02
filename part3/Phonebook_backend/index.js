@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 
@@ -18,7 +19,8 @@ morgan.token('postData', (req) => {
 /** Create token for logging*/
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :postData'));
 app.use(express.json());
-
+// Serve files from the 'dist' 
+app.use(express.static(path.join(__dirname, 'dist')));
 
 const phonebookEntries = [
         { 
@@ -94,6 +96,9 @@ app.get('/info', (req, res) => {
     res.send(`<p>Phonebook has info for ${phonebookEntries.length} people</p><p>${date}</p>`);
 });
 
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
