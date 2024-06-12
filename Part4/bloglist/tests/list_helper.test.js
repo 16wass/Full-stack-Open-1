@@ -90,3 +90,49 @@ describe('total likes', () => {
     assert.strictEqual(result, 0);
   });
 });
+describe('favorite blog', () => {
+    const listWithOneBlog = [
+      {
+        title: "Canonical string reduction",
+        author: "Edsger W. Dijkstra",
+        likes: 12
+      }
+    ];
+    const listWithMultipleBlogs = [
+      {
+        title: "Canonical string reduction",
+        author: "Edsger W. Dijkstra",
+        likes: 12
+      },
+      {
+        title: "Canonical",
+        author: "Edsger",
+        likes: 11       
+      },
+      {
+        title: "Reduction",
+        author: "Dijkstra",
+        likes: 2
+      }
+    ];
+    const emptyList = [];
+    test('when list has only one blog, equals that blog', () => {
+      const result = listHelper.favoriteBlog(listWithOneBlog);
+      assert.deepStrictEqual(result, listWithOneBlog[0]);
+    }
+    );
+    test('when list has multiple blogs, equals the blog with the most likes', () => {
+      const result = listHelper.favoriteBlog(listWithMultipleBlogs);
+      assert.deepStrictEqual(result, listWithMultipleBlogs[0]);
+    }
+    );
+    test('when list is empty, equals null', () => {
+      const result = listHelper.favoriteBlog(emptyList);
+      assert.strictEqual(result, null);
+    }
+    );
+  });
+
+
+
+          
