@@ -1,26 +1,29 @@
 const express = require('express');
-const router = express.Router();
+const blogsRouter  = express.Router();
 const Blog = require('../models/blog');
 
 
-router.get('/', async (request, response, next) => {
-    try {
-      const blogs = await Blog.find({});
-      response.json(blogs);
-    } catch (error) {
-      next(error);
-    }
+blogsRouter .get('/', async (request, response) => {
+  const blogs = await Blog.find({});
+  response.json(blogs);
   });
   
-  router.post('/', async (request, response, next) => {
-    try {
-      const blog = new Blog(request.body);
-      const savedBlog = await blog.save();
-      response.status(201).json(savedBlog);
-    } catch (error) {
-      next(error);
-    }
-  });
+blogsRouter .post('/', async (request, response) => {
+  const { title, url, author, likes } = new Blog(request.body);
+
+if (!title || !url) {
+  return response.status(400).json({ error: 'Title and URL are required' });
+}
+const blog = new Blog({
+  title,
+  url,
+  author,
+  likes: likes || 0
+});
+
+const savedBlog = await blog.save();
+response.statuts(201).json(savedBlog);
+});
   
-  module.exports = router;
+module.exports = blogsRouter;
   
