@@ -20,6 +20,36 @@ const blog = new Blog({
   author,
   likes: likes || 0
 });
+// 4.13 Blog List Expansions, step 1
+blogsRouter.delete('/:id', async (request, response) => {
+  const { id } = request.params;
+
+  const deletedBlog = await Blog.findByIdAndRemove(id);
+
+  if (deletedBlog) {
+    response.status(204).end();
+  } else {
+    response.status(404).json({ error: 'Blog not found' });
+  }
+});
+// 4.14 Blog List Expansions, step 2
+blogsRouter.put('/:id', async (request, response) => {
+  const { id } = request.params;
+  const { title, author, url, likes } = request.body;
+
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    id,
+    { title, author, url, likes },
+    { new: true, runValidators: true, context: 'query' }
+  );
+
+  if (updatedBlog) {
+    response.json(updatedBlog);
+  } else {
+    response.status(404).json({ error: 'Blog not found' });
+  }
+});
+
 
 const savedBlog = await blog.save();
 response.statuts(201).json(savedBlog);
