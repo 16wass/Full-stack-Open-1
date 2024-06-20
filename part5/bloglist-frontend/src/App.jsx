@@ -58,6 +58,9 @@ const App = () => {
       setBlogs(blogs.concat(data));
     });
   };
+  const updateBlog = (id, updatedBlog) => {
+    setBlogs(blogs.map(blog => blog.id !== id ? blog : updatedBlog));
+  };
 
   const loginForm = () => (
     <Togglable buttonLabel="log in">
@@ -89,7 +92,7 @@ const App = () => {
       </div>
       <ul>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} updateBlog ={updateBlog}/>
         )}
       </ul>
       <Footer />

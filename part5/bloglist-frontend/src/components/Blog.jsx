@@ -14,6 +14,12 @@ const Blog = ({ blog }) => {
   const toggleVisibility = () => {
     setVisible(!visible);
   };
+  const handleLike= async () => {
+    const updatedBlog = { ...blog, likes: blog.likes + 1 };
+    await blogService.update(blog.id, updatedBlog);
+    updatedBlog(blog.id, updatedBlog);
+  }
+
 
   return (
     <div style={blogStyle}>
@@ -23,7 +29,7 @@ const Blog = ({ blog }) => {
       {visible && (
         <div>
           <p>{blog.url}</p>
-          <p>{blog.likes} likes <button>like</button></p>
+          <p>{blog.likes} likes <button onClick ={handleLike}> like </button></p>
           <p>{blog.user.name}</p>
         </div>
       )}
