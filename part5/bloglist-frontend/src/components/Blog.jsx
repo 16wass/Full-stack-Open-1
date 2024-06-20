@@ -19,6 +19,12 @@ const Blog = ({ blog }) => {
     await blogService.update(blog.id, updatedBlog);
     updatedBlog(blog.id, updatedBlog);
   }
+  const handleDelete = async () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      removeBlog(blog.id);
+    }
+  }
+
 
 
   return (
@@ -31,6 +37,9 @@ const Blog = ({ blog }) => {
           <p>{blog.url}</p>
           <p>{blog.likes} likes <button onClick ={handleLike}> like </button></p>
           <p>{blog.user.name}</p>
+          {user.username === blog.user.username && (
+            <button onClick={handleRemove}>remove</button>
+          )}
         </div>
       )}
     </div>

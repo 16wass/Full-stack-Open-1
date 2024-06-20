@@ -61,6 +61,12 @@ const App = () => {
   const updateBlog = (id, updatedBlog) => {
     setBlogs(blogs.map(blog => blog.id !== id ? blog : updatedBlog));
   };
+  const removeBlog = (id) => {
+    blogService.remove(id)
+      .then(() => {
+        setBlogs(blogs.filter(blog => blog.id !== id));
+      });
+  };
 
   const loginForm = () => (
     <Togglable buttonLabel="log in">
@@ -73,6 +79,8 @@ const App = () => {
       />
     </Togglable>
   );
+  // sort the blog posts by the number of likes
+  const sortedBlogs = blogs.slice().sort((a, b) => b.likes - a.likes);
 
   return (
     <div>
@@ -91,8 +99,14 @@ const App = () => {
         </button>
       </div>
       <ul>
-        {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} updateBlog ={updateBlog}/>
+        {sortedBlogs.map(blog =>
+          <Blog 
+          key={blog.id} 
+          blog={blog} 
+          updateBlog ={updateBlog}
+          removeBlog={removeBlog}
+          user={user}
+          />
         )}
       </ul>
       <Footer />
