@@ -37,12 +37,7 @@ const App = () => {
     )  
   }, [])
 
-  /*blogService
-      .create(blogObject)
-      .then(data => {
-        setBlogs(blogs.concat(data))
-        setNewBlog('')
-      })*/
+
 
   
   const handleLogin = async (event) => {
@@ -66,6 +61,39 @@ const App = () => {
       }, 5000)
     }
   }
+  const addBlog = (blogObject) => {
+    blogFormRef.current.toggleVisibility()
+    blogService
+      .create(blogObject)
+      .then(data => {
+        setBlogs(blogs.concat(data))
+        setNewBlog('')
+    })
+  }
+  const loginForm = () => {
+    const hideWhenVisible = { display: loginVisible ? 'none' : '' }
+    const showWhenVisible = { display: loginVisible ? '' : 'none' }
+
+    return (
+      <div>
+        <div style={hideWhenVisible}>
+          <button onClick={() => setLoginVisible(true)}>log in</button>
+        </div>
+        <div style={showWhenVisible}>
+          <LoginForm
+            username={username}
+            password={password}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            handleSubmit={handleLogin}
+          />
+          <button onClick={() => setLoginVisible(false)}>cancel</button>
+        </div>
+      </div>
+    )
+  }
+
+
 
   return (
     <div>
@@ -75,7 +103,10 @@ const App = () => {
       {!user && loginForm()}
       {user && <div>
        <p>{user.name} logged in</p>
-         {blogForm()}
+        <Togglable buttonLabel="new blog" ref={blogFormRef}>
+           <BlogForm createBlog={addBlog} />  
+        </Togglable>
+           
       </div>
       } 
       <div>
@@ -84,7 +115,7 @@ const App = () => {
         </button>
       </div> 
       <ul>
-         {blogs.map(blog =>
+         {blogsToShow.map(blog =>
          <Blog key={blog.id} blog={blog} />
       )}
       </ul>
