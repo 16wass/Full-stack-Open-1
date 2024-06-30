@@ -28,17 +28,17 @@ const Blog = ({ blog }) => {
 
 
   return (
-    <div style={blogStyle}>
-      <div>
+    <div style={blogStyle} className='blog '>
+      <div className='blog-tilte-author'>
         {blog.title} {blog.author} <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
       </div>
       {visible && (
-        <div>
+        <div className='blog-details'>
           <p>{blog.url}</p>
           <p>{blog.likes} likes <button onClick ={handleLike}> like </button></p>
           <p>{blog.user.name}</p>
           {user.username === blog.user.username && (
-            <button onClick={handleRemove}>remove</button>
+            <button onClick={handleDelete}>remove</button>
           )}
         </div>
       )}
