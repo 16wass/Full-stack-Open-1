@@ -46,6 +46,23 @@ describe('Blog app', () => {
     describe('When logged in', () => {
         beforeEach(async ({ page }) => {
            await page.goto('http://localhost:5173');
+           const blogPosts = [
+            { title: 'Blog 1', author: 'Author 1', likes: 5 },
+            { title: 'Blog 2', author: 'Author 2', likes: 10 },
+            { title: 'Blog 3', author: 'Author 3', likes: 3 },
+            ];
+            
+            for (const blog of blogPosts) {
+                await page.click('button:text("new blog")');
+                await page.fill('input[name="title"]', blog.title);
+                await page.fill('input[name="author"]', blog.author);
+                await page.fill('input[name="url"]', 'test url');
+                await page.click('button:text("submit")');
+            }
+            for (let i = 0; i < blogPosts.length; i++) {
+                await page.click(`div.blog:has-text("${blog.title}") button:text("like")`);
+
+            } 
         })
       
         test('a new blog can be created', async ({ page }) => {
@@ -84,13 +101,46 @@ describe('Blog app', () => {
             await expect(page).not.toHaveText('Test Author');
             await expect(page).not.toHaveText('0 likes'); 
         });
-        
+        /** 5.22: Blog List End To End Testing, step 6 */
+        test('only the user who added the blog sees the delete button', async ({ page }) => {
+            
+            // 
+            for (let i = 0; i < users.length; i++) {
+              const blog = blogs[i];
+              const deleteButtonSelector = `div.blog:has-text("${blog.title}") button:text("remove")`;
+      
+              
+              await page.goto('http://localhost:5173'); 
+              await page.fill('input[name="username"]', users[i].username);
+              await page.fill('input[name="password"]', users[i].password);
 
-        
+              await Promise.all([
+                page.waitForNavigation(),
+                page.click('form > button[type="submit"]'),
+              ]);
+      
+              if (blog.user.username === users[i].username) {
+                await expect(page).toHaveSelector(deleteButtonSelector); 
+              } else {
+                await expect(page).not.toHaveSelector(deleteButtonSelector); 
+              }
+            }
+        });
+        /** 5.23: Blog List End To End Testing, step 7 */
+        test('blogs are ordered by likes, most liked first', async ({ page }) => {
+            
+            const blogPosts = await page.$$eval('div.blog', blogs => blogs.map(blog => ({
+              title: blog.querySelector('div > div:first-child').innerText.trim(),
+              likes: Number(blog.querySelector('div > div:nth-child(2) p').innerText.split(' ')[0])
+            })));
+      
+            // verify order by likes
+            for (let i = 1; i < blogPosts.length; i++) {
+              expect(blogPosts[i - 1].likes).toBeGreaterThanOrEqual(blogPosts[i].likes);
+            }
+          });
     })
 
     
-
-
   });
 })
