@@ -17,7 +17,7 @@ describe('Blog app', () => {
     await expect (page).toHaveText('form > button');
   });
 
-
+  /** 5.18: Blog List End To End Testing, step 2 */
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
       await page.fill('input[name="username"]', user.username);
@@ -41,7 +41,8 @@ describe('Blog app', () => {
       await page.click('form > button[type="submit"]');
       await expect(page).toHaveText('Wrong username or password. Please try again.');
     });
-
+    
+    /** 5.19: Blog List End To End Testing, step 3 */
     describe('When logged in', () => {
         beforeEach(async ({ page }) => {
            await page.goto('http://localhost:5173');
@@ -63,7 +64,33 @@ describe('Blog app', () => {
 
 
         })
-      })
+        /** 5.20: Blog List End To End Testing, step 4 */
+        test('a user can like a blog', async ({ page }) => {
+            await page.click('button:text("view")');
+
+            await page.click('button:text("like")');
+            // adding a like
+            await expect(page).toHaveText('1 likes');
+        });
+        /**5.21: Blog List End To End Testing, step 5 */
+        test('a blog can be deleted by the user who added it', async ({ page }) => {
+            await page.click(`div.blog:has-text("${createdBlog}") button:text("remove")`);
+            
+            //window.confirm dialog in the delete operation
+            await page.on('dialog', async dialog => {
+                await dialog.accept(); 
+            });
+            await expect(page).not.toHaveText('Test Blog Title');
+            await expect(page).not.toHaveText('Test Author');
+            await expect(page).not.toHaveText('0 likes'); 
+        });
+        
+
+        
+    })
+
+    
+
 
   });
 })
