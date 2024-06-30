@@ -59,15 +59,17 @@ test ('clicking the button shows the blog\'s url and number of likes', () => {
             name: 'Test ',
           },
     };
+    // mock event handler function to mock handleLike
     const mockHandler = jest.fn()
     render(<Blog blog={blog} user={{ username: 'user' }} handleLike={mockHandler} />);
-    
+
     const viewButton = screen.getByText('view')
     userEvent.click(viewButton)
     // like button is clicked twice
     const likeButton = screen.getByText('like')
     fireEvent.click(likeButton)
     fireEvent.click(likeButton)
+    /// the event handler is called twice
     expect(mockHandleLike.mock.calls).toHaveLength(2);
 });
     

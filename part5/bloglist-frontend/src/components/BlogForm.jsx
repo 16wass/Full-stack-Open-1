@@ -6,7 +6,7 @@ const BlogForm = ({ createBlog }) => {
   const addBlog = (event) => {
     event.preventDefault();
     const blogObject = {
-      title: newBlog,
+      title: 'newBlog',
       author: 'author',
       url: 'url',
       likes: 0
