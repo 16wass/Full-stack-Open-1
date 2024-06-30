@@ -41,5 +41,29 @@ describe('Blog app', () => {
       await page.click('form > button[type="submit"]');
       await expect(page).toHaveText('Wrong username or password. Please try again.');
     });
+
+    describe('When logged in', () => {
+        beforeEach(async ({ page }) => {
+           await page.goto('http://localhost:5173');
+        })
+      
+        test('a new blog can be created', async ({ page }) => {
+            await page.click('button:text("new blog")');
+
+            await page.fill('input[name="title"]', 'test title');
+            await page.fill('input[name="author"]', 'test author');
+            await page.fill('input[name="url"]', 'test url');
+
+            await page.click('button:text("submit")');
+
+            await expect(page).toHaveText('test title ');
+            await expect(page).toHaveText('test author');
+            await expect(page).toHaveText('test url');
+            await expect(page).toHaveText('0 likes');
+
+
+        })
+      })
+
   });
 })
