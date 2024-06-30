@@ -4,6 +4,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
+/** checks that the component displaying a blog renders the blog's title and author,
+  but does not render its URL or number of likes by default. */
 test ('renders content', () => {
     const blog = {
         title: 'Component testing is done with react-testing-library',
@@ -15,12 +17,34 @@ test ('renders content', () => {
     /**const element = screen.getByText('Component testing is done with react-testing-library')
     expect(element).toBeDefined() */
     const titleElement = screen.getByText('Component testing is done with react-testing-library ')
-    expect(titleElement).toBeDefined()
+    expect(titleElement).toBeInTheDocument()
     const authorElement = screen.getByText('author')
-    expect(authorElement).toBeDefined()
+    expect(authorElement).toBeInTheDocument()
+
     const urlElement = screen.getByText('url')
-    expect(urlElement).toBeDefined()
-    const likesElement = screen.getByText('likes')
-    expect(likesElement).toBeDefined()
+    expect(urlElement).not.toBeInTheDocument()
+    const likesElement = screen.getByText('4 likes')
+    expect(likesElement).not.toBeInTheDocument()
+});
+/**checks that the blog's URL and number of likes are shown when the button controlling the shown details has been clicked. */
+test ('clicking the button shows the blog\'s url and number of likes', () => {
+    const blog = {
+        title: 'Component testing is done with react-testing-library',
+        author : 'author',
+        url : 'url',
+        likes : 4,
+        user: {
+            username: 'user',
+            name: 'Test ',
+          },
+    };
+    render(<Blog blog={blog} user={{ username: 'user' }} />);
+    const button = screen.getByText('view')
+    userEvent.click(button)
+
+    const urlElement = screen.getByText('url')
+    expect(urlElement).toBeInTheDocument()
+    const likesElement = screen.getByText('4 likes')
+    expect(likesElement).toBeInTheDocument()
 });
 
