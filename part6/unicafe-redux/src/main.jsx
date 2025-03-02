@@ -12,6 +12,17 @@ const App = () => {
       type: 'GOOD'
     })
   }
+  const ok = ()=>{
+    store.dispatch({
+      type:'OK'
+    })
+  }
+  const bad =() =>{
+    type: 'BAD'
+  }
+  const resetStats = () =>{
+    type: 'ZERO'
+  }
 
   return (
     <div>
