@@ -4,8 +4,9 @@ import { Provider } from 'react-redux'
 import App from './App'
 import reducer from './reducers/anecdoteReducer'
 import rootReducer from './reducers'
+import store from './store'
 
-const store = createStore(rootReducer)
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <Provider store={store}>
